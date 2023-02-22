@@ -85,6 +85,11 @@ If you have questions concerning this license or the applicable additional terms
 #define _vsnprintf		use_idStr_vsnPrintf
 #endif
 
+int D3_sprintf(char * s, const char * format, ...);
+int D3_vsprintf(char * s, const char * format, va_list arg);
+#define sprintf			D3_sprintf
+#define vsprintf		D3_vsprintf
+
 class idVec4;
 
 #ifndef FILE_HASH_SIZE
@@ -307,7 +312,7 @@ public:
 	static idVec4 &		ColorForIndex( int i );
 
 	friend int			sprintf( idStr &dest, const char *fmt, ... );
-	friend int			vsprintf( idStr &dest, const char *fmt, va_list ap );
+	friend int			vsprintf( idStr &dest, const char *fmt, va_list argptr );
 
 	void				ReAllocate( int amount, bool keepold );				// reallocate string data buffer
 	void				FreeData( void );									// free allocated string memory

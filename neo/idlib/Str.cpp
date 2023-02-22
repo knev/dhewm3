@@ -34,6 +34,10 @@ If you have questions concerning this license or the applicable additional terms
 
 #include "idlib/Str.h"
 
+#undef sprintf
+#undef vsprintf
+#include <stdio.h>
+
 // DG: idDynamicBlockAlloc isn't thread-safe and idStr is used both in the main thread
 //     and the async thread! For some reason this seems to cause lots of problems on
 //     newer Linux distros if dhewm3 is built with GCC9 or newer (see #391).
@@ -1639,7 +1643,7 @@ int idStr::BestUnit( const char *format, float value, Measure_t measure ) {
 	}
 	unit--;
 	value /= 1 << ( unit * 10 );
-	sprintf( *this, format, value );
+	D3_sprintf( *this, format, value );
 	*this += " ";
 	*this += units[ measure ][ unit ];
 	return unit;
@@ -1652,7 +1656,7 @@ idStr::SetUnit
 */
 void idStr::SetUnit( const char *format, float value, int unit, Measure_t measure ) {
 	value /= 1 << ( unit * 10 );
-	sprintf( *this, format, value );
+	D3_sprintf( *this, format, value );
 	*this += " ";
 	*this += units[ measure ][ unit ];
 }
@@ -1783,6 +1787,32 @@ idStr idStr::FormatNumber( int number ) {
 	}
 
 	return string;
+}
+
+int D3_sprintf(char * s, const char * fmt, ...) {
+	int ret = 0;
+	va_list argptr;
+	va_start( argptr, fmt );
+	ret = vsprintf( s, fmt, argptr );
+	va_end( argptr );
+	return ret;
+}
+
+int D3_vsprintf(char * s, const char * fmt, va_list argptr) {
+	return vsprintf( s, fmt, argptr );
+}
+
+int D3_sprintf( idStr &dest, const char *fmt, ... ) {
+	int ret = 0;
+	va_list argptr;
+	va_start( argptr, fmt );
+	ret = vsprintf( dest, fmt, argptr );
+	va_end( argptr );
+	return ret;
+}
+
+int D3_vsprintf( idStr &dest, const char * fmt, va_list argptr ) {
+	return vsprintf( dest, fmt, argptr );
 }
 
 // behaves like C99's vsnprintf() by returning the amount of bytes that
